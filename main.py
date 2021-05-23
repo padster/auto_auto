@@ -21,7 +21,9 @@ FILTERS = {
 MIN_YEAR = 2018
 MAX_PRICE = 18000
 
-
+CANADA_DRIVES_PATH = \
+    "https://shop.canadadrives.ca/cars/bc?SID2=buy-a-car-online-vancouver&" + \
+    f"region=BC&sort_by=product_price_asc&year={MIN_YEAR}&transmission=automatic&product_price=0_{MAX_PRICE}"
 
 def parseInt(s):
     return int(s.replace(',',''))
@@ -218,7 +220,7 @@ def combineAll():
     dataAT, _ = autoTraderToPandas()
     print ("+ %d cars from AutoTrader" % len(dataAT))
 
-    allDF = pd.concat([dataCD, dataCL, dataAT])
+    allDF = pd.concat([dataCD, dataCL, dataAT], ignore_index=True)
     allDF['date'] = datetime.today().strftime('%Y-%m-%d')
     return allDF
 
@@ -233,5 +235,5 @@ def runAndWrite():
     print ("\n\n-=-=-\nDone! Wrote %d cars\n\t%s" % (len(allDF), outPath))
     return allDF
 
-#df = runAndWrite()
-#print ("\n\n%d cars loaded into 'df'" % df.shape[0])
+df = runAndWrite()
+print ("\n\n%d cars loaded into 'df'" % df.shape[0])
