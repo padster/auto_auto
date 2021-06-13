@@ -1,5 +1,3 @@
-#!/home/pat/code/python/anaconda/envs/carscrape/bin/python -i
-
 # Load all of the results scraped today into a dataframe for analysis.
 # Also apply some basic filters to narrow down the results into a simpler
 #    df to make it easier to quickly browse.
