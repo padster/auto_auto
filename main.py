@@ -13,13 +13,13 @@ from requests_html_modified import HTMLSession
 # Whatever your preference - should make sure to narrow it down
 # enough to not generate thousands of results.
 FILTERS = {
-    'min_year': 2018,
-    'max_price': 18000,
+    'min_year': 2019,
+    'max_price': 22000,
 }
 
 # temporary - replace with above
-MIN_YEAR = 2018
-MAX_PRICE = 18000
+MIN_YEAR = 2019
+MAX_PRICE = 22000
 
 CANADA_DRIVES_PATH = \
     "https://shop.canadadrives.ca/cars/bc?SID2=buy-a-car-online-vancouver&" + \
