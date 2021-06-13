@@ -4,6 +4,7 @@
 import asyncio
 import os
 import pandas as pd
+import sys
 
 from datetime import datetime
 from requests_html_modified import HTMLSession
@@ -12,7 +13,6 @@ from requests_html_modified import HTMLSession
 from autotrader import AutotraderSource
 from canada_drives import CanadaDrivesSource
 from clutch import ClutchSource
-
 
 # Whatever your preference - should make sure to narrow it down
 # enough to not generate thousands of results.
@@ -38,7 +38,7 @@ def runAndWrite():
     outPath = 'data/%s.csv' % datetime.today().strftime('%Y-%m-%d')
     if os.path.exists(outPath):
         print ("%s already exists!\nCopy/move the old one first" % outPath)
-        return
+        sys.exit(1)
 
     allDF = combineAll(FILTERS)
     allDF.to_csv(outPath)
@@ -46,4 +46,6 @@ def runAndWrite():
     return allDF
 
 df = runAndWrite()
+#df, _ = CanadaDrivesSource().runAll(FILTERS)
+
 print ("\n\n%d cars loaded into 'df'" % df.shape[0])

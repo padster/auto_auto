@@ -1,5 +1,7 @@
 # Load car options from Canada Drives
 
+from urllib.parse import urlencode
+
 import pandas as pd
 import util
 
@@ -7,11 +9,14 @@ from requests_html_modified import HTMLSession
 
 class CanadaDrivesSource:
     def path(self, opt):
-        # TODO: optional params.
-        return (
-            "https://shop.canadadrives.ca/cars/bc?SID2=buy-a-car-online-vancouver&" + \
-            "region=BC&sort_by=product_price_asc&year={min_year}&transmission=automatic&product_price=0_{max_price}"
-        ).format(**opt)
+        queryParams = {
+            'region': 'BC',
+            'sort_by': 'just_listed',
+            'transmission': 'automatic',
+            'product_price': '0_{max_price}'.format(**opt),
+            'year': '{min_year}'.format(**opt),
+        }
+        return "https://shop.canadadrives.ca/cars/bc?" + urlencode(queryParams)
 
     # CarElt -> Car
     def eltToCar(self, carElt):

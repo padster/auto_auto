@@ -1,5 +1,7 @@
 # Car source for Clutch
 
+from urllib.parse import urlencode
+
 import pandas as pd
 import util
 
@@ -7,11 +9,12 @@ from requests_html_modified import HTMLSession
 
 class ClutchSource:
     def path(self, opt):
-        # TODO: optional params.
-        return (
-            "https://www.clutch.ca/british-columbia?" + \
-            "priceHigh={max_price}&transmissions=2&yearLow={min_year}"
-        ).format(**opt)
+        queryParams = {
+            'transmissions': 2,
+            'priceHigh': '{max_price}'.format(**opt),
+            'yearLow': '{min_year}'.format(**opt),
+        }
+        return "https://www.clutch.ca/british-columbia?" + urlencode(queryParams)
 
     # CarElt -> Car
     def eltToCar(self, carElt):

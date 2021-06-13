@@ -1,5 +1,7 @@
 # Load car options from Canada Drives
 
+from urllib.parse import urlencode
+
 import pandas as pd
 import util
 
@@ -11,11 +13,23 @@ class AutotraderSource:
 
     def path(self, opt):
         # TODO: optional params.
-        return (
-            "https://www.autotrader.ca/cars/bc/vancouver/?rcp={page_sz}&rcs={page_sz}&srt=9&" + \
-            "yRng={min_year}%2C&pRng=%2C{max_price}&prx=100&prv=British%20Columbia&loc=V6B0E6&" + \
-            "trans=Automatic&hprc=True&wcp=True&sts=New-Used&adtype=Dealer&inMarket=advancedSearch"
-        ).format(**opt)
+        queryParams = {
+            'trans': 'Automatic',
+            'loc': 'V5N2T2',
+            'srt': 9,
+            'prv': 'British%20Columbia',
+            'prx': 100,
+            'hprc': 'True',
+            'wcp': 'True',
+            'sts': 'Used',
+            'adtype': 'Dealer',
+            'inMarket': 'advancedSearch',
+            'rcp': '{page_sz}'.format(**opt),
+            'rcs': '{page_sz}'.format(**opt),
+            'yRng': '{min_year},'.format(**opt),
+            'pRng': ',{max_price}'.format(**opt)
+        }
+        return "https://www.autotrader.ca/cars/bc/vancouver/?" + urlencode(queryParams)
 
     # CarElt -> Car
     def eltToCar(self, carElt):
