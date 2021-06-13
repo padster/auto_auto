@@ -7,13 +7,39 @@ import util
 
 from requests_html_modified import HTMLSession
 
+CLUTCH_MAKE_TO_ID = {
+    'Honda': 14,
+    'Kia': 5,
+    'Toyota': 6,
+}
+
+CLUTCH_MODEL_TO_ID = {
+    'Corolla': 7,
+    'Soul': 6,
+}
+
 class ClutchSource:
+    def addMakeModelToQuery(self, opt, params):
+        # Yuck. Done as ID lookups, not as text strings.
+        # Model ID should be unique?
+        if 'make' in opt:
+            if opt['make'] in CLUTCH_MAKE_TO_ID:
+                params['makes'] = CLUTCH_MAKE_TO_ID[opt['make']]
+            else:
+                raise Exception(f"Unknown make: {opt['make']}, please look up on Clutch and add to CLUTCH_MAKE_TO_ID")
+        if 'model' in opt and :
+            if opt['model'] in CLUTCH_MODEL_TO_ID:
+                params['models'] = CLUTCH_MODEL_TO_ID[opt['model']]
+            else:
+                raise Exception(f"Unknown model: {opt['model']}, please look up on Clutch and add to CLUTCH_MODEL_TO_ID")
+
     def path(self, opt):
         queryParams = {
             'transmissions': 2,
             'priceHigh': '{max_price}'.format(**opt),
             'yearLow': '{min_year}'.format(**opt),
         }
+        self.addMakeModelToQuery(opt, queryParams)
         return "https://www.clutch.ca/british-columbia?" + urlencode(queryParams)
 
     # CarElt -> Car

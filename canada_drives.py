@@ -16,6 +16,10 @@ class CanadaDrivesSource:
             'product_price': '0_{max_price}'.format(**opt),
             'year': '{min_year}'.format(**opt),
         }
+        if 'make' in opt:
+            queryParams['make'] = opt['make']
+        if 'model' in opt:
+            queryParams['model'] = opt['model']
         return "https://shop.canadadrives.ca/cars/bc?" + urlencode(queryParams)
 
     # CarElt -> Car

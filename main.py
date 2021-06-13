@@ -18,7 +18,9 @@ from clutch import ClutchSource
 # enough to not generate thousands of results.
 FILTERS = {
     'min_year': 2019,
-    'max_price': 22000,
+    'max_price': 20000,
+    'make': 'Kia',
+    'model': 'Soul' #3, 2, 11
 }
 
 ### ALL!

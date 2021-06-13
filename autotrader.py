@@ -29,7 +29,14 @@ class AutotraderSource:
             'yRng': '{min_year},'.format(**opt),
             'pRng': ',{max_price}'.format(**opt)
         }
-        return "https://www.autotrader.ca/cars/bc/vancouver/?" + urlencode(queryParams)
+        parts = ['cars']
+        if 'make' in opt:
+            parts.append(opt['make'].lower())
+            if 'model' in opt:
+                parts.append(opt['model'].lower())
+        parts.append('bc')
+        parts.append('vancouver')
+        return "https://www.autotrader.ca/" + '/'.join(parts) + '/?' + urlencode(queryParams)
 
     # CarElt -> Car
     def eltToCar(self, carElt):
