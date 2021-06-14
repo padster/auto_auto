@@ -8,7 +8,7 @@ import util
 from requests_html_modified import HTMLSession
 
 class AutotraderSource:
-    N_PAGES = 2
+    N_PAGES = 1
     PAGE_SZ = 100
 
     def maybeQueryRange(self, opt, queryParams, optKey, queryKey):

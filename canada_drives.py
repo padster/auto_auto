@@ -83,7 +83,7 @@ class CanadaDrivesSource:
     def load(self, session, url):
         print ("Loading...\n\t%s" % url)
         page = session.get(url)
-        page.html.render(sleep=3, timeout=15)
+        page.html.render(sleep=3, timeout=30)
         print ("Loaded!\n")
         return page
 

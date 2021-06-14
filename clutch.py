@@ -10,11 +10,17 @@ from requests_html_modified import HTMLSession
 CLUTCH_MAKE_TO_ID = {
     'Honda': 14,
     'Kia': 5,
+    'Mazda': 2,
     'Toyota': 6,
+    'Volkswagen': 13,
 }
 
 CLUTCH_MODEL_TO_ID = {
     'Corolla': 7,
+    'Highlander': 83,
+    'Odyssey': 90,
+    'Pilot': 229,
+    'Sienna': 16,
     'Soul': 6,
 }
 
