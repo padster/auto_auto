@@ -17,20 +17,31 @@ from clutch import ClutchSource
 # Whatever your preference - should make sure to narrow it down
 # enough to not generate thousands of results.
 FILTERS = {
-    'min_year': 2019,
-    'max_price': 20000,
-    'make': 'Kia',
-    'model': 'Soul' #3, 2, 11
+    'min_year': 2015,
+    'max_year': 2017,
+    'min_price': 30000,
+    'max_price': 39999,
+    'min_km': 40000,
+    'max_km': 49999,
 }
 
 ### ALL!
 def combineAll(opt):
-    dataCD, _ = CanadaDrivesSource().runAll(opt)
+    session = HTMLSession(
+        browser_args=["--no-sandbox", '--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36']
+    )
+
+    dataCD = CanadaDrivesSource().runAll(session, opt)
     print ("  %d cars from Canada Drives" % len(dataCD))
-    dataCL, _ = ClutchSource().runAll(opt)
+    dataCL = ClutchSource().runAll(session, opt)
     print ("+ %d cars from Clutch" % len(dataCL))
-    dataAT, _ = AutotraderSource().runAll(opt)
+    dataAT = AutotraderSource().runAll(session, opt)
     print ("+ %d cars from Autotrader" % len(dataAT))
+
+    try:
+        session.close()
+    except Exception as ex:
+        print (ex)
 
     allDF = pd.concat([dataCD, dataCL, dataAT], ignore_index=True)
     allDF['date'] = datetime.today().strftime('%Y-%m-%d')
@@ -43,7 +54,7 @@ def runAndWrite():
         sys.exit(1)
 
     allDF = combineAll(FILTERS)
-    allDF.to_csv(outPath)
+    allDF.to_csv(outPath, index=False, header=True)
     print ("\n\n-=-=-\nDone! Wrote %d cars\n\t%s" % (len(allDF), outPath))
     return allDF
 

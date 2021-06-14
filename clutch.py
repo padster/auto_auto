@@ -27,11 +27,18 @@ class ClutchSource:
                 params['makes'] = CLUTCH_MAKE_TO_ID[opt['make']]
             else:
                 raise Exception(f"Unknown make: {opt['make']}, please look up on Clutch and add to CLUTCH_MAKE_TO_ID")
-        if 'model' in opt and :
+        if 'model' in opt:
             if opt['model'] in CLUTCH_MODEL_TO_ID:
                 params['models'] = CLUTCH_MODEL_TO_ID[opt['model']]
             else:
                 raise Exception(f"Unknown model: {opt['model']}, please look up on Clutch and add to CLUTCH_MODEL_TO_ID")
+
+    def maybeQueryRange(self, opt, queryParams, optKey, queryKey):
+        minKey, maxKey = f'min_{optKey}', f'max_{optKey}'
+        if minKey in opt:
+            queryParams[f'{queryKey}Low'] = opt[minKey]
+        if maxKey in opt:
+            queryParams[f'{queryKey}High'] = opt[maxKey]
 
     def path(self, opt):
         queryParams = {
@@ -39,6 +46,15 @@ class ClutchSource:
             'priceHigh': '{max_price}'.format(**opt),
             'yearLow': '{min_year}'.format(**opt),
         }
+        self.maybeQueryRange(opt, queryParams, 'year', 'year')
+        self.maybeQueryRange(opt, queryParams, 'km', 'mileage')
+        self.maybeQueryRange(opt, queryParams, 'price', 'price')
+
+        if 'min_km' in opt:
+            queryParams['mileageLow'] = opt['min_km']
+        if 'max_km' in opt:
+            queryParams['mileageHigh'] = opt['max_km']
+
         self.addMakeModelToQuery(opt, queryParams)
         return "https://www.clutch.ca/british-columbia?" + urlencode(queryParams)
 
@@ -88,18 +104,18 @@ class ClutchSource:
         return page.html.find('[data-element=VehicleCard]')
 
     # URL -> Page
-    def load(self, url):
+    def load(self, session, url):
         print ("Loading...\n\t%s" % url)
-        session = HTMLSession()
         page = session.get(url)
-        page.html.render(sleep=3, timeout=15)
+        page.html.render(sleep=15, timeout=15)
         print ("Loaded!\n")
         return page
 
-    def runAll(self, opt):
+    def runAll(self, session, opt):
         url = self.path(opt)
-        page = self.load(url)
+        page = self.load(session, url)
         carElts = self.pageToElts(page)
         cars = [self.eltToCar(elt) for elt in carElts]
         cars = [car for car in cars if car is not None]
-        return pd.DataFrame(cars), page
+        page.close()
+        return pd.DataFrame(cars)

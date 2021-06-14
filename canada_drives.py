@@ -8,18 +8,31 @@ import util
 from requests_html_modified import HTMLSession
 
 class CanadaDrivesSource:
+    def maybeQueryRange(self, opt, queryParams, optKey, queryKey):
+        minKey, maxKey = f'min_{optKey}', f'max_{optKey}'
+        hasMin, hasMax = minKey in opt, maxKey in opt
+        if hasMin and hasMax:
+            queryParams[queryKey] = '%s_%s' % (opt[minKey], opt[maxKey])
+        elif hasMin:
+            queryParams[queryKey] = opt[minKey]
+        elif hasMax:
+            queryParams[queryKey] = '0_%s' % (opt[maxKey])
+
     def path(self, opt):
         queryParams = {
             'region': 'BC',
             'sort_by': 'just_listed',
             'transmission': 'automatic',
             'product_price': '0_{max_price}'.format(**opt),
-            'year': '{min_year}'.format(**opt),
         }
+        self.maybeQueryRange(opt, queryParams, 'year', 'year')
+        self.maybeQueryRange(opt, queryParams, 'km', 'kms')
+        self.maybeQueryRange(opt, queryParams, 'price', 'product_price')
         if 'make' in opt:
             queryParams['make'] = opt['make']
         if 'model' in opt:
             queryParams['model'] = opt['model']
+
         return "https://shop.canadadrives.ca/cars/bc?" + urlencode(queryParams)
 
     # CarElt -> Car
@@ -67,18 +80,18 @@ class CanadaDrivesSource:
         return page.html.find('.vehicle-card')
 
     # URL -> Page
-    def load(self, url):
+    def load(self, session, url):
         print ("Loading...\n\t%s" % url)
-        session = HTMLSession()
         page = session.get(url)
         page.html.render(sleep=3, timeout=15)
         print ("Loaded!\n")
         return page
 
-    def runAll(self, opt):
+    def runAll(self, session, opt):
         url = self.path(opt)
-        page = self.load(url)
+        page = self.load(session, url)
         carElts = self.pageToElts(page)
         cars = [self.eltToCar(elt) for elt in carElts]
         cars = [car for car in cars if car is not None]
-        return pd.DataFrame(cars), page
+        page.close()
+        return pd.DataFrame(cars)

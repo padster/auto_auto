@@ -7,7 +7,7 @@ from datetime import datetime
 
 # All data scraped today
 TODAY_PATH = 'data/%s.csv' % datetime.today().strftime('%Y-%m-%d')
-allDF = pd.read_csv(TODAY_PATH)
+allDF = pd.read_csv(TODAY_PATH, index_col=None, header=0)
 print ("%d cars loaded into 'allDF'" % allDF.shape[0])
 
 # Whatever you want can go here to narrow down the preferences.

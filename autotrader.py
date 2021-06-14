@@ -11,6 +11,15 @@ class AutotraderSource:
     N_PAGES = 2
     PAGE_SZ = 100
 
+    def maybeQueryRange(self, opt, queryParams, optKey, queryKey):
+        minKey, maxKey = f'min_{optKey}', f'max_{optKey}'
+        hasMin, hasMax = minKey in opt, maxKey in opt
+        if hasMin or hasMax:
+            queryParams[queryKey] = ','.join([
+                str(opt.get(minKey, '')),
+                str(opt.get(maxKey, ''))
+            ])
+
     def path(self, opt):
         # TODO: optional params.
         queryParams = {
@@ -26,9 +35,11 @@ class AutotraderSource:
             'inMarket': 'advancedSearch',
             'rcp': '{page_sz}'.format(**opt),
             'rcs': '{page_sz}'.format(**opt),
-            'yRng': '{min_year},'.format(**opt),
-            'pRng': ',{max_price}'.format(**opt)
         }
+        self.maybeQueryRange(opt, queryParams, 'year', 'yRng')
+        self.maybeQueryRange(opt, queryParams, 'km', 'oRng')
+        self.maybeQueryRange(opt, queryParams, 'price', 'pRng')
+
         parts = ['cars']
         if 'make' in opt:
             parts.append(opt['make'].lower())
@@ -80,15 +91,14 @@ class AutotraderSource:
         return page.html.find('.result-item')
 
     # URL -> Page
-    def load(self, url):
+    def load(self, session, url):
         print ("Loading...\n\t%s" % url)
-        session = HTMLSession(browser_args=["--no-sandbox", '--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36'])
         page = session.get(url)
         page.html.render(scrolldown=33, sleep=4, timeout=15)
         print ("Loaded!\n")
         return page
 
-    def runAll(self, opt):
+    def runAll(self, session, opt):
         allCars = []
 
         for pageNum in range(self.N_PAGES):
@@ -98,9 +108,10 @@ class AutotraderSource:
                 'page_start': pageNum * self.PAGE_SZ,
             }
             url = self.path(pageOpt)
-            page = self.load(url)
+            page = self.load(session, url)
             carElts = self.pageToElts(page)
             cars = [self.eltToCar(elt) for elt in carElts]
             cars = [car for car in cars if car is not None]
+            page.close()
 
-        return pd.DataFrame(cars), page
+        return pd.DataFrame(cars)
